@@ -1,148 +1,115 @@
-# HOW TO RUN THE TEST SUITE DUPLICATE DETECTOR
-### No coding knowledge needed — just follow these steps exactly
+# How To Run The Test Suite Duplicate Detector
 
----
+This guide is written for non-technical users. Follow the steps exactly.
 
-## BEFORE YOU START — Install Two Things (One Time Only)
+## One-Time Setup
 
-You need to install two Python libraries. You only do this once ever.
+Install Python dependencies:
 
-**Step 1:** Open **VS Code**
-
-**Step 2:** At the top of VS Code, click **Terminal** → **New Terminal**
-A black panel will open at the bottom of the screen. This is normal.
-
-**Step 3:** Type this command exactly and press Enter:
-```
+```bash
 pip install pandas openpyxl
 ```
 
-Wait for it to finish. You will see text scrolling. When it stops and shows a `>` again, it is done.
+You only need to do this once on your machine.
 
----
+## Run The Included Demo
 
-## EVERY TIME YOU WANT TO RUN THE TOOL
+From this project folder, run:
 
-### Step 1 — Put Your Files in One Folder
-
-Create a folder on your desktop called **TestSuiteTool**
-
-Put these two files inside that folder:
-- `analyze_tests.py` (the Python script)
-- Your Excel test case file (e.g. `WorkdayTestCases.xlsx`)
-
----
-
-### Step 2 — Tell the Script Your Filename
-
-Open `analyze_tests.py` in VS Code.
-
-Look for **line 20** which says:
-```python
-INPUT_FILE = "my_test_cases.xlsx"
-```
-
-Change `my_test_cases.xlsx` to the **exact name** of your Excel file.
-
-For example, if your file is called `Workday_TC_2024.xlsx`, change it to:
-```python
-INPUT_FILE = "Workday_TC_2024.xlsx"
-```
-
-Save the file (Ctrl + S).
-
----
-
-### Step 3 — Open the Folder in VS Code
-
-In VS Code: **File** → **Open Folder** → Select your **TestSuiteTool** folder
-
----
-
-### Step 4 — Run the Script
-
-Option A — Click the ▶ Play button at the top right of VS Code
-
-Option B — In the Terminal at the bottom, type:
-```
+```bash
 python analyze_tests.py
 ```
-and press Enter.
 
----
+The script uses the included file:
 
-### Step 5 — Wait
-
-You will see messages appearing in the Terminal like:
-```
-Loading: Workday_TC_2024.xlsx
-Rows loaded: 4523
-Unique test cases found: 1043
-Comparing 1043 test cases against each other...
-This may take 1-2 minutes...
+```text
+test_cases.xlsx
 ```
 
-**Do not close VS Code.** Wait until you see "OUTPUT FILE SAVED".
+It creates this output file:
 
-For 1000+ test cases this takes about 1–3 minutes.
-
----
-
-### Step 6 — Open Your Results
-
-Look in your **TestSuiteTool** folder. A new file will have appeared:
-```
-Workday_TC_2024_DUPLICATES_FLAGGED.xlsx
+```text
+test_cases_DUPLICATES_FLAGGED.xlsx
 ```
 
-Open it in Excel. It has **3 tabs**:
+Open that file in Excel and start with the `SUMMARY` tab.
+
+## Run Your Own Excel File
+
+Put your Excel file in the same folder as `analyze_tests.py`.
+
+Run:
+
+```bash
+python analyze_tests.py Your_File_Name.xlsx
+```
+
+Example:
+
+```bash
+python analyze_tests.py Workday_Test_Cases.xlsx
+```
+
+The output will be:
+
+```text
+Workday_Test_Cases_DUPLICATES_FLAGGED.xlsx
+```
+
+## Required Columns
+
+Your Excel file must include:
+
+- `Test Case ID`
+- `Summary` or `Test Case Name`
+
+Optional but useful columns:
+
+- `Description`
+- `Test Case Area`
+- `Area`
+- `Module`
+- `Feature`
+
+## Understanding The Output
+
+The generated Excel file has three tabs:
 
 | Tab | What it shows |
-|-----|---------------|
-| **SUMMARY** | Start here — totals and colour guide |
-| **All Tests - Flagged** | Every test case with colour coding |
-| **Duplicate Pairs Report** | Every matched pair side by side with % score |
+| --- | --- |
+| `SUMMARY` | Totals, color guide, and next steps |
+| `All Tests - Flagged` | Every original row with duplicate status |
+| `Duplicate Pairs Report` | Duplicate pairs side by side with match percentage |
 
----
+| Color | Meaning | What to do |
+| --- | --- | --- |
+| Red | Exact duplicate | Review and remove/merge one |
+| Orange | Near duplicate | Read both and decide |
+| Green | Unique | Keep |
 
-## UNDERSTANDING YOUR RESULTS
+## Troubleshooting
 
-| Colour | Meaning | What to do |
-|--------|---------|------------|
-| 🔴 **Red** | Exact duplicate (92%+ match) | Delete one — very safe |
-| 🟠 **Orange** | Near duplicate (70–91% match) | Read both and decide |
-| 🟢 **Green** | Unique | Keep as is |
+### Cannot find file
 
-**Start with the Duplicate Pairs Report tab.**
-- Sort by **Match %** column descending
-- Red rows first — these are the safest to action
-- For each pair: decide which one to KEEP (usually the more detailed / up to date one)
+Check that:
 
----
+- The Excel filename is spelled exactly right
+- The Excel file is in the same folder as `analyze_tests.py`
+- You included `.xlsx` at the end of the filename
 
-## IF SOMETHING GOES WRONG
+### No module named pandas or openpyxl
 
-**Error: "Cannot find file"**
-→ Make sure your Excel filename matches exactly what is in line 20 of the script
-→ Make sure both files are in the same folder
+Run:
 
-**Error: "No module named pandas"**
-→ Go back to Before You Start and run `pip install pandas openpyxl` again
+```bash
+pip install pandas openpyxl
+```
 
-**Error: "Could not find the 'summary' column"**
-→ Open your Excel and check the exact spelling of your column headers
-→ The script expects: Test case id, Summary, Test case area, Description,
-  Test step number, Test step action, Test step expected result
+### Missing required column
 
----
+Make sure your Excel file contains:
 
-## NEED HELP?
+- `Test Case ID`
+- `Summary` or `Test Case Name`
 
-Ask GitHub Copilot inside VS Code. Press **Ctrl+I** and type what the error says.
-Example: *"I'm getting this error when running my Python script: [paste error]"*
-Copilot will tell you exactly what to fix.
-
----
-
-*Built for: Lloyds Banking — Workday Compensation Test Suite*
-*Requires: Python + pandas + openpyxl (all free, no internet needed to run)*
+Rename the columns in Excel if needed, save the file, then run the command again.
