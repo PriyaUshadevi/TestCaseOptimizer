@@ -57,6 +57,15 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def validate_thresholds(exact_threshold: float, similar_threshold: float) -> None:
+    if not 0 <= similar_threshold <= 1:
+        raise ValueError("--similar-threshold must be between 0 and 1.")
+    if not 0 <= exact_threshold <= 1:
+        raise ValueError("--exact-threshold must be between 0 and 1.")
+    if similar_threshold > exact_threshold:
+        raise ValueError("--similar-threshold must be less than or equal to --exact-threshold.")
+
+
 def similarity(a: str, b: str) -> float:
     """Return a 0-1 similarity score between two strings."""
     if not a or not b:
@@ -313,6 +322,8 @@ def write_report(
     duplicate_pairs: list[tuple[str, str, str, str, float, str]],
     flagged_ids: dict[str, str],
 ) -> None:
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+
     report_df = df.copy()
     report_df["DUPLICATE STATUS"] = report_df[id_col].map(
         lambda value: flagged_ids.get(clean(value), "UNIQUE - KEEP")
@@ -348,8 +359,18 @@ def main() -> int:
         print("Place the Excel file in this folder or pass the full path to the file.")
         return 1
 
+    try:
+        validate_thresholds(args.exact_threshold, args.similar_threshold)
+    except ValueError as exc:
+        print(f"\nERROR: {exc}")
+        return 1
+
     print(f"\nLoading: {input_file}")
-    df = pd.read_excel(input_file, dtype=str)
+    try:
+        df = pd.read_excel(input_file, dtype=str)
+    except Exception as exc:
+        print(f"\nERROR: Could not read '{input_file}'. {exc}")
+        return 1
     df.columns = [str(column).strip() for column in df.columns]
     print(f"Rows loaded: {len(df)}")
     print(f"Columns found: {list(df.columns)}")

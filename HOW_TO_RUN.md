@@ -7,7 +7,7 @@ This guide is written for non-technical users. Follow the steps exactly.
 Install Python dependencies:
 
 ```bash
-pip install pandas openpyxl
+python -m pip install -r requirements.txt
 ```
 
 You only need to do this once on your machine.
@@ -102,7 +102,7 @@ Check that:
 Run:
 
 ```bash
-pip install pandas openpyxl
+python -m pip install -r requirements.txt
 ```
 
 ### Missing required column
